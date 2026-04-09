@@ -37,7 +37,7 @@ public class CommonController {
             //original file name
             String originalFilename = file.getOriginalFilename();
             //截取原始文件名的后缀
-            String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             //构建新文件名称
             String objectName = UUID.randomUUID().toString() + extension;
             //文件的请求路径
