@@ -60,10 +60,10 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 shoppingCart.setImage(setmeal.getImage());
                 shoppingCart.setAmount(setmeal.getPrice());
             }
-        }
         shoppingCart.setNumber(1);
         shoppingCart.setCreateTime(LocalDateTime.now());
         shoppingCartMapper.insert(shoppingCart);
+        }
 
     }
 
@@ -94,7 +94,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
      *
      * @param shoppingCartDTO
      */
-    //TODO DEBUG delete ShoppingCart Function
     public void subShoppingCart(ShoppingCartDTO shoppingCartDTO) {
         ShoppingCart shoppingCart = new ShoppingCart();
         BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
