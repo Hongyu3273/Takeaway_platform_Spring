@@ -294,4 +294,18 @@ public class OrderServiceImpl implements OrderService {
         // 将购物车对象批量添加到数据库
         shoppingCartMapper.insertBatch(shoppingCartList);
     }
+
+
+    /**
+     * 条件查询订单
+     * @param ordersPageQueryDTO
+     * @return
+     */
+    //TODO finish this function
+    public PageResult conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO) {
+            PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
+
+
+            return null;
+    }
 }
