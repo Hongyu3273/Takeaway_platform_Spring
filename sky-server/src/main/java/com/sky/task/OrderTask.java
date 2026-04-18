@@ -1,0 +1,63 @@
+package com.sky.task;
+
+
+import com.sky.entity.Orders;
+import com.sky.mapper.OrderMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Component
+@Slf4j
+public class OrderTask {
+
+
+
+
+
+    @Autowired
+    private OrderMapper orderMapper;
+
+    /**
+     * 处理超时订单方法
+     */
+    @Scheduled(cron = "0 * * * * ?")
+    public void processTimeoutOrder() {
+        log.info("定期处理超时订单:{}", LocalDateTime.now());
+
+        int status = Orders.PENDING_PAYMENT;
+        LocalDateTime time = LocalDateTime.now().plusMinutes(-15);
+        List<Orders> ordersList = orderMapper.getByStatusAndOrderTimeLT(status, time);
+        if (!ordersList.isEmpty()) {
+            for (Orders orders : ordersList) {
+                orders.setStatus(Orders.CANCELLED);
+                orders.setCancelReason("订单超时，自动取消");
+                orders.setCancelTime(LocalDateTime.now());
+                orderMapper.update(orders);
+            }
+        }
+    }
+
+
+    /**
+     * 处理长期处于派送中订单
+     */
+    @Scheduled(cron = "0 0 1 * * ?")
+    public void processDeliveryOrder() {
+        log.info("处理长期处于派送中订单:{}", LocalDateTime.now());
+        LocalDateTime time = LocalDateTime.now().plusMinutes(-60);
+        List<Orders> orderList = orderMapper.getByStatusAndOrderTimeLT(Orders.DELIVERY_IN_PROGRESS, time);
+        if (!orderList.isEmpty()) {
+            for (Orders orders : orderList) {
+                orders.setStatus(Orders.COMPLETED);
+                orders.setDeliveryTime(LocalDateTime.now());  // 改用送达时间，删除错误字段
+                orderMapper.update(orders);
+            }
+        }
+    }
+
+}
