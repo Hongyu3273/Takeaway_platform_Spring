@@ -5,7 +5,6 @@ import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
-import com.sky.service.UserService;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
@@ -39,23 +38,16 @@ public class ReportServiceImpl implements ReportService {
      * @return
      */
     public TurnoverReportVO getTurnoverStatistics(LocalDate begin, LocalDate end) {
-        //当前集合用于存放从begin到end范围内每天的日期
-        List<LocalDate> dateList = new ArrayList<>();
-        dateList.add(begin);
-
-        while (!begin.equals(end)) {
-            //计算指定日期后一天对应日期
-            begin = begin.plusDays(1);
-            dateList.add(begin);
-        }
+        // 当前集合用于存放从begin到end范围内每天的日期
+        List<LocalDate> dateList = getDateList(begin, end);
 
         List<Double> turnoverList = new ArrayList<>();
         for (LocalDate date : dateList) {
             //查询date日期对应营业额数据,营业额是指状态为已完成的金额合计
             LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
             LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
-            //select sum(amount) from orders where order_time > ? and order_time < ? and status = ?
-            Map map = new HashMap();
+            //select sum(amount) from orders where order_time >= ? and order_time <= ? and status = ?
+            Map<String, Object> map = new HashMap<>();
             map.put("begin", beginTime);
             map.put("end", endTime);
             map.put("status", Orders.COMPLETED);
@@ -79,33 +71,42 @@ public class ReportServiceImpl implements ReportService {
      * @return
      */
     public UserReportVO getUserStatistics(LocalDate begin, LocalDate end) {
-        List<LocalDate> dateList = new ArrayList<>();
-        dateList.add(begin);
-        while (!begin.equals(end)) {
-            begin = begin.plusDays(1);
-            dateList.add(begin);
-        }
-        //新增用户数量
-        List<Integer> newUserserList = new ArrayList<>();
-        //每天总用户数量
+        List<LocalDate> dateList = getDateList(begin, end);
+        // 新增用户数量
+        List<Integer> newUserList = new ArrayList<>();
+        // 每天总用户数量
         List<Integer> totalUserList = new ArrayList<>();
         for (LocalDate date : dateList) {
             LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
             LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
-            Map map = new HashMap();
+            Map<String, Object> map = new HashMap<>();
             map.put("end", endTime);
-            //总用户数量
+            // 总用户数量
             Integer totalUser = userMapper.countByMap(map);
             map.put("begin", beginTime);
             Integer newUser = userMapper.countByMap(map);
             totalUserList.add(totalUser);
-            newUserserList.add(newUser);
+            newUserList.add(newUser);
         }
 
         return UserReportVO.builder()
                 .dateList(StringUtils.join(dateList, ","))
-                .newUserList(StringUtils.join(newUserserList, ","))
+                .newUserList(StringUtils.join(newUserList, ","))
                 .totalUserList(StringUtils.join(totalUserList, ","))
                 .build();
+    }
+
+    private List<LocalDate> getDateList(LocalDate begin, LocalDate end) {
+        List<LocalDate> dateList = new ArrayList<>();
+        if (begin == null || end == null || begin.isAfter(end)) {
+            return dateList;
+        }
+
+        LocalDate cursor = begin;
+        while (!cursor.isAfter(end)) {
+            dateList.add(cursor);
+            cursor = cursor.plusDays(1);
+        }
+        return dateList;
     }
 }
