@@ -54,7 +54,6 @@ public class OrderTask {
         if (!orderList.isEmpty()) {
             for (Orders orders : orderList) {
                 orders.setStatus(Orders.COMPLETED);
-                orders.setDeliveryTime(LocalDateTime.now());  // 改用送达时间，删除错误字段
                 orderMapper.update(orders);
             }
         }
