@@ -4,6 +4,7 @@ package com.sky.controller.admin;
 import com.sky.result.Result;
 import com.sky.service.ReportService;
 import com.sky.vo.TurnoverReportVO;
+import com.sky.vo.UserReportVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,7 @@ import java.time.LocalDate;
 @Slf4j
 @Api(tags = "数据统计相关接口")
 
-public class ReportController{
+public class ReportController {
 
 
     @Autowired
@@ -32,6 +33,7 @@ public class ReportController{
 
     /**
      * 营业额统计
+     *
      * @param begin
      * @param end
      * @return
@@ -39,9 +41,26 @@ public class ReportController{
     @GetMapping("/turnoverStatistics")
     @ApiOperation("营业额统计")
     public Result<TurnoverReportVO> turnoverStatistics(
-            @DateTimeFormat(pattern = "yyyy-MM-dd")LocalDate begin,
-            @DateTimeFormat(pattern = "yyyy-MM-dd")LocalDate end){
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
         log.info("营业额数据统计： {},{}", begin, end);
         return Result.success(reportService.getTurnoverStatistics(begin, end));
     }
+
+    /**
+     * 用户统计
+     *
+     * @return
+     */
+    @GetMapping("/userStatistics")
+    @ApiOperation("用户统计")
+    public Result<UserReportVO> userStatistic(
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end
+    ) {
+        log.info("用户数据统计： {},{}", begin, end);
+        return Result.success(reportService.getUserStatistics(begin, end));
+    }
+
+
 }
