@@ -1,11 +1,13 @@
 package com.sky.service.impl;
 
 
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
@@ -136,6 +138,37 @@ public class ReportServiceImpl implements ReportService {
     }
 
 
+
+    /**
+     * 销量排名统计
+     *
+     * @param begin
+     * @param end
+     * @return
+     */
+    public SalesTop10ReportVO getSalesTop10Statistics(LocalDate begin, LocalDate end) {
+        if (begin == null || end == null || begin.isAfter(end)) {
+            return SalesTop10ReportVO.builder()
+                    .nameList("")
+                    .numberList("")
+                    .build();
+        }
+
+        LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
+        List<GoodsSalesDTO> salesTop10 = orderMapper.getSalesTop10(beginTime, endTime);
+        if (salesTop10 == null) {
+            salesTop10 = Collections.emptyList();
+        }
+        List<String> names = salesTop10.stream().map(GoodsSalesDTO::getName).toList();
+        List<Integer> numbers = salesTop10.stream().map(GoodsSalesDTO::getNumber).toList();
+        return SalesTop10ReportVO.builder()
+                .nameList(StringUtils.join(names, ","))
+                .numberList(StringUtils.join(numbers, ","))
+                .build();
+    }
+
+
     /**
      * 根据条件统计订单数量
      *
@@ -154,6 +187,13 @@ public class ReportServiceImpl implements ReportService {
     }
 
 
+    /**
+     * 日期边界处理
+     *
+     * @param begin
+     * @param end
+     * @return
+     */
     private List<LocalDate> getDateList(LocalDate begin, LocalDate end) {
         List<LocalDate> dateList = new ArrayList<>();
         if (begin == null || end == null || begin.isAfter(end)) {
@@ -167,4 +207,6 @@ public class ReportServiceImpl implements ReportService {
         }
         return dateList;
     }
+
+
 }
