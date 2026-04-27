@@ -1,0 +1,27 @@
+# Copy this file to application-dev.yml and fill in your own values.
+# application-dev.yml is git-ignored — never commit real credentials.
+
+sky:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    host: localhost
+    port: 3306
+    database: sky_take_out
+    username: root
+    password: YOUR_MYSQL_PASSWORD
+
+  redis:
+    host: localhost
+    port: 6379
+    password: ""
+    database: 0
+
+  alioss:
+    endpoint:          YOUR_OSS_ENDPOINT          # e.g. oss-cn-hangzhou.aliyuncs.com
+    access-key-id:     YOUR_ACCESS_KEY_ID
+    access-key-secret: YOUR_ACCESS_KEY_SECRET
+    bucket-name:       YOUR_BUCKET_NAME
+
+  wechat:
+    appid:  YOUR_WECHAT_APPID
+    secret: YOUR_WECHAT_SECRET

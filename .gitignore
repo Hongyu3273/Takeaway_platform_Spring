@@ -1,6 +1,16 @@
+# Build output
 **/target/
-.idea
-*.iml
 *.class
-*Test.java
-**/test/
+
+# IDE
+.idea/
+*.iml
+
+# 只排除练习目录，保留正式测试
+**/test/java/testForPractice/
+
+# 排除本地配置（含数据库密码）
+**/resources/application-dev.yml
+
+# Docker volumes
+.docker/
